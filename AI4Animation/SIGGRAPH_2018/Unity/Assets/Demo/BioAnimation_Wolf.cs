@@ -9,7 +9,7 @@ using UnityEditor;
 namespace SIGGRAPH_2018 {
 	[RequireComponent(typeof(Actor))]
 	public class BioAnimation_Wolf : MonoBehaviour {
-
+		public bool Pause = false;
 		public bool Inspect = false;
 
 		public bool ShowTrajectory = true;
@@ -31,7 +31,8 @@ namespace SIGGRAPH_2018 {
 		private PIDController PID;
 
 		//State
-		private Vector3[] Positions = new Vector3[0];
+		public Vector3[] Positions = new Vector3[0];
+
 		private Vector3[] Forwards = new Vector3[0];
 		private Vector3[] Ups = new Vector3[0];
 		private Vector3[] Velocities = new Vector3[0];
@@ -70,7 +71,7 @@ namespace SIGGRAPH_2018 {
 			Actor = GetComponent<Actor>();
 			NN = GetComponent<MANN>();
 			MotionEditing = GetComponent<MotionEditing>();
-			TargetDirection = new Vector3(transform.forward.x, 0f, transform.forward.z);
+			TargetDirection = new Vector3(0.1f, 0f, 1.0f);// (chongyiz): Fix initial forward direction
 			TargetVelocity = Vector3.zero;
 			PID = new PIDController(0.2f, 0.8f, 0f);
 			Positions = new Vector3[Actor.Bones.Length];
@@ -123,8 +124,9 @@ namespace SIGGRAPH_2018 {
 		}
 
 		public void Reinitialise() {
+			Debug.Log("Reinitialising...");
 			transform.position = Vector3.zero;
-			TargetDirection = new Vector3(transform.forward.x, 0f, transform.forward.z);
+			TargetDirection = new Vector3(0.1f, 0f, 1.0f);// (chongyiz): Fix initial forward direction
 			TargetVelocity = Vector3.zero;
 			PID = new PIDController(0.2f, 0.8f, 0f);
 			Positions = new Vector3[Actor.Bones.Length];
@@ -146,24 +148,29 @@ namespace SIGGRAPH_2018 {
 		}
 
 		void Update() {
-			if(NN.Parameters == null) {
-				return;
-			}
+			if (Pause == false) {
+				if(NN.Parameters == null) {
+					return;
+				}
 
-			if(TrajectoryControl) {
-				PredictTrajectory();
-			}
+				if(TrajectoryControl) {
+					PredictTrajectory();
+				}
 
-			if(NN.Parameters != null) {
-				Animate();
-			}
+				if(NN.Parameters != null) {
+					Animate();
+				}
 
-			if(MotionEditing != null) {
-				MotionEditing.Process();
-				for(int i=0; i<Actor.Bones.Length; i++) {
-					Vector3 position = Actor.Bones[i].Transform.position;
-					position.y = Positions[i].y;
-					Positions[i] = Vector3.Lerp(Positions[i], position, MotionEditing.GetStability());
+				if(MotionEditing != null) {
+					MotionEditing.Process();
+					for(int i=0; i<Actor.Bones.Length; i++) {  // (chongyiz): 27 bones
+						Vector3 position = Actor.Bones[i].Transform.position;
+						position.y = Positions[i].y;
+						Positions[i] = Vector3.Lerp(Positions[i], position, MotionEditing.GetStability());
+						// Debug.Log("Bone " + i + " position: x = " + Positions[i][0] + 
+						// 		  ", y = " + Positions[i][1] + ", z = " + Positions[i][2]);
+						// Debug.Log("Bone " + i + " position: " + Positions[i]);
+					}
 				}
 			}
 		}

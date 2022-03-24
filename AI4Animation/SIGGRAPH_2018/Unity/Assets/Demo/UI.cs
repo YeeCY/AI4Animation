@@ -17,6 +17,7 @@ namespace SIGGRAPH_2018 {
 
 		public Button FlatButton;
 		public Button TerrainButton;
+		public Button RecordButton;
 		public Button SkeletonButton;
 		public Button TransformsButton;
 		public Button VelocitiesButton;
@@ -26,7 +27,7 @@ namespace SIGGRAPH_2018 {
 		public Button FootfallPatternButton;
 
 		public Text EscapeText;
-
+		private bool RecordMotion = false;
 		private bool Skeleton = true;
 		private bool Transforms = false;
 		private bool Velocities = false;
@@ -82,6 +83,12 @@ namespace SIGGRAPH_2018 {
 			ApplyGUI();
 		}
 
+		public void ToggleRecorder() {
+			RecordMotion = !RecordMotion;
+			ApplyVisualisation();
+			ApplyGUI();
+		}
+
 		public void ToggleSkeleton() {
 			Skeleton = !Skeleton;
 			ApplyVisualisation();
@@ -131,6 +138,7 @@ namespace SIGGRAPH_2018 {
 		}
 
 		private void ApplyVisualisation() {
+			Character.GetComponent<MotionRecorder>().enabled = RecordMotion;
 			Character.GetComponent<ExpertActivation>().enabled = ExpertActivation;
 			Character.GetComponent<TensorActivation>().enabled = NetworkWeights;
 			Character.GetComponent<FootfallPattern>().enabled = FootfallPattern;
@@ -150,6 +158,12 @@ namespace SIGGRAPH_2018 {
 				TerrainButton.GetComponent<Image>().color = UltiDraw.Mustard;
 			} else {
 				TerrainButton.GetComponent<Image>().color = UltiDraw.BlackGrey;
+			}
+
+			if(RecordMotion) {
+				RecordButton.GetComponent<Image>().color = UltiDraw.Mustard;
+			} else {
+				RecordButton.GetComponent<Image>().color = UltiDraw.BlackGrey;
 			}
 
 			if(Skeleton) {
