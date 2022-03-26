@@ -41,9 +41,9 @@ public class MotionRecorder : MonoBehaviour {
     }
 
     void Start() {
-        FramePositions = new List<Vector3[]>();
-        TimeStamps = new List<float>();
-        OutputFramePositions = new List<Vector3[]>();
+        // FramePositions = new List<Vector3[]>();
+        // TimeStamps = new List<float>();
+        // OutputFramePositions = new List<Vector3[]>();
         
         Recording = false;
         ApplyGUI();
@@ -106,6 +106,9 @@ public class MotionRecorder : MonoBehaviour {
     public void OnStart() {
         OutputFileName = OutputFileNameInputField.GetComponent<InputField>().text;
         // Debug.Log("Ouput File Name: MotionRecordings/" + OutputFileName);
+        FramePositions = new List<Vector3[]>();
+        TimeStamps = new List<float>();
+        OutputFramePositions = new List<Vector3[]>();
         StartTimeStamp = Utility.GetTimestamp();
 
         gameObject.GetComponent<BioAnimation_Wolf>().Pause = false;
