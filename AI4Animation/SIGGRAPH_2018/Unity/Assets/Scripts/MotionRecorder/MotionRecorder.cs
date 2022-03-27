@@ -137,9 +137,6 @@ public class MotionRecorder : MonoBehaviour {
 
             float start = TimeStamps[0];
             float end = TimeStamps[TimeStamps.Count - 1];
-            // Debug.Log("Start: " + start);
-            // Debug.Log("End: " + end);
-            // Debug.Log("FramePositions Count: " + FramePositions.Count);
             for(float t = start; t <= end; t += 1f / Framerate) {
                 // Editor.LoadFrame(t);
                 // states.Add(new State(Editor));
@@ -192,12 +189,18 @@ public class MotionRecorder : MonoBehaviour {
 
 	public Vector3[] GetFramePositions(float time) {
         int TotalFrame = FramePositions.Count;
-        float TotalTime = (float)FramePositions.Count / Framerate;
+        float TotalTime = TimeStamps[TimeStamps.Count - 1] - TimeStamps[0];
 		if(time < 0f || time > TotalTime) {
 			Debug.Log("Please specify a time between 0 and " + TotalTime + ".");
 			return null;
 		}
-		return FramePositions[Mathf.Min(Mathf.RoundToInt(time * Framerate) + 1, TotalFrame)];
+        
+        float start_time = TimeStamps[0];
+        float end_time = TimeStamps[TimeStamps.Count - 1];
+
+        float index = (TotalFrame - 1) * (time - start_time) / (end_time - start_time);
+        
+		return FramePositions[(int)index];
 	}
 
     private StreamWriter CreateFile(string name) {
